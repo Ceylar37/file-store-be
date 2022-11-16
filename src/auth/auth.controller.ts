@@ -1,14 +1,20 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserCredsDto } from '../users/dto/userCredsDto';
 import { ReadableUserDto } from '../users/dto/readableUser.dto';
+import { HttpBadRequest } from '../swagger.types';
 
 @ApiTags('Authorization')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiResponse({ status: HttpStatus.OK, type: ReadableUserDto })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: HttpBadRequest,
+  })
   @Post('signUp')
   async singUp(
     @Res({ passthrough: true }) res,
@@ -22,12 +28,16 @@ export class AuthController {
     };
   }
 
+  @ApiResponse({ status: HttpStatus.OK, type: ReadableUserDto })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: HttpBadRequest,
+  })
   @Post('signIn')
   async singIn(
     @Res({ passthrough: true }) res,
     @Body() dto: UserCredsDto,
   ): Promise<ReadableUserDto> {
-    console.log(dto);
     const userData = await this.authService.signIn(dto);
     res.cookie('token', userData.token, { httpOnly: true });
     return {

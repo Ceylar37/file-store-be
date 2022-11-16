@@ -49,7 +49,6 @@ export class AuthService {
 
   async signIn(dto: UserCredsDto): Promise<ReadableUserWithTokenDto> {
     const user = await this.usersService.findByLogin(dto.login);
-    console.log(user);
     if (!user)
       throw new HttpException(
         'Invalid user or password',

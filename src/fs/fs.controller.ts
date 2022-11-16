@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Post,
   Req,
@@ -16,7 +17,25 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateFileBodyDto } from './dto/createFileBody.dto';
 import { CreateDirectoryBodyDto } from './dto/createDirectoryBody.dto';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiForbiddenResponse,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { FsDto } from './dto/fs.dto';
+import {
+  FileUploadDto,
+  HttpForbidden,
+  HttpUnauthorized,
+} from '../swagger.types';
+import { ReadableFileDto } from './dto/readableFile.dto';
+import { DirectoryDto } from './dto/directory.dto';
 
+@ApiTags('File System')
 @Controller('files')
 export class FsController {
   constructor(
@@ -24,25 +43,35 @@ export class FsController {
     private readonly jwtService: JwtService,
   ) {}
 
+  @ApiResponse({ status: HttpStatus.OK, type: FsDto })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    type: HttpUnauthorized,
+  })
   @UseGuards(AuthGuard)
   @Get('my')
-  async getMyFiles(@Req() req) {
+  async getMyFiles(@Req() req): Promise<FsDto> {
     const tokenData = await this.jwtService.verify(req.cookies.token, {
       secret: process.env.SECRET,
     });
     return this.fsService.getUserFiles(tokenData.id);
   }
 
-  @UseGuards(AuthGuard)
-  @Get('oneFile/:id')
-  async getFile(@Param('id') id: string) {
-    const fileData = await this.fsService.getFile(id);
+  // @UseGuards(AuthGuard)
+  // @Get('oneFile/:id')
+  // async getFile(@Param('id') id: string) {
+  //   const fileData = await this.fsService.getFile(id);
+  //
+  //   return {
+  //     id: fileData._id,
+  //   };
+  // }
 
-    return {
-      id: fileData._id,
-    };
-  }
-
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    type: HttpUnauthorized,
+  })
+  @ApiForbiddenResponse({ status: HttpStatus.FORBIDDEN, type: HttpForbidden })
   @UseGuards(AuthGuard)
   @Get('read/:id/:name')
   async readFile(@Param('id') id: string, @Req() req) {
@@ -54,6 +83,15 @@ export class FsController {
     return new StreamableFile(fileStream);
   }
 
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: HttpStatus.OK, type: ReadableFileDto })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    type: HttpUnauthorized,
+  })
+  @ApiBody({
+    type: FileUploadDto,
+  })
   @UseGuards(AuthGuard)
   @Post('uploadFile')
   @UseInterceptors(FileInterceptor('file'))
@@ -73,6 +111,12 @@ export class FsController {
     });
   }
 
+  @ApiResponse({ status: HttpStatus.OK, type: DirectoryDto })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    type: HttpUnauthorized,
+  })
+  @ApiForbiddenResponse({ status: HttpStatus.FORBIDDEN, type: HttpForbidden })
   @UseGuards(AuthGuard)
   @Post('createDirectory')
   async createDirectory(@Req() req, @Body() body: CreateDirectoryBodyDto) {
@@ -86,6 +130,13 @@ export class FsController {
     });
   }
 
+  @ApiParam({ name: 'id' })
+  @ApiResponse({ status: HttpStatus.OK, type: FsDto })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    type: HttpUnauthorized,
+  })
+  @ApiForbiddenResponse({ status: HttpStatus.FORBIDDEN, type: HttpForbidden })
   @UseGuards(AuthGuard)
   @Get('directoryContent/:id')
   async getDirectoryContent(@Req() req, @Param('id') directoryId) {
