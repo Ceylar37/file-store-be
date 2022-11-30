@@ -3,7 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 
-const whitelist = process.env.ORIGINS;
+const whitelist = process.env.ORIGINS.split(',');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
