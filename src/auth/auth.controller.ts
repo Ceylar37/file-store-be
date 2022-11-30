@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  HttpStatus,
-  Post,
-  Res,
-  Ip,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserCredsDto } from '../users/dto/userCredsDto';
 import { ReadableUserDto } from '../users/dto/readableUser.dto';
 import { HttpBadRequest } from '../swagger.types';
-import { IpAddress } from '../decorators/IpAddress';
 
 @ApiTags('Authorization')
 @Controller('auth')
