@@ -13,7 +13,11 @@ async function bootstrap() {
     },
   });
   app.use(cookieParser());
-  app.enableCors();
+  app.enableCors({
+    credentials: true,
+    origin: process.env.CLIENT_URL,
+    methods: '*',
+  });
   const config = new DocumentBuilder().setTitle('File store').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/docs', app, document);
