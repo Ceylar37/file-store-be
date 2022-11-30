@@ -9,7 +9,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    origin: 'http://10.1.46.89:3000',
+    origin: 'http://localhost:3000,http://10.1.46.89:3000',
     methods: '*',
   });
   const config = new DocumentBuilder().setTitle('File store').build();
