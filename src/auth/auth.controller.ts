@@ -1,4 +1,12 @@
-import { Body, Controller, HttpStatus, Post, Res, Ip } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Res,
+  Ip,
+  Req,
+} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserCredsDto } from '../users/dto/userCredsDto';
@@ -36,6 +44,7 @@ export class AuthController {
   })
   @Post('signIn')
   async singIn(
+    @Req() req,
     @Res({ passthrough: true }) res,
     @Body() dto: UserCredsDto,
     @IpAddress() ipAddress,
@@ -43,6 +52,7 @@ export class AuthController {
   ): Promise<ReadableUserDto> {
     console.log(ipAddress);
     console.log(ip);
+    console.log(req.ip);
     const userData = await this.authService.signIn(dto);
     res.cookie('token', userData.token, { httpOnly: true });
     return {
