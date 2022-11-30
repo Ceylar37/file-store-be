@@ -8,8 +8,8 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    origin: '*',
-    methods: 'GET,PUT,POST,DELETE,UPDATE,OPTIONS',
+    origin: 'http://localhost:3000',
+    methods: '*',
   });
   const config = new DocumentBuilder().setTitle('File store').build();
   const document = SwaggerModule.createDocument(app, config);

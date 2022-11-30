@@ -32,7 +32,6 @@ export class AuthService {
       login: dto.login,
       password: hashPassword,
     });
-    console.log('createdUser', createdUser);
 
     const tokenPayload = {
       id: createdUser.id,
