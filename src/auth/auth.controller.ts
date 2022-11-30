@@ -49,9 +49,11 @@ export class AuthController {
     @Body() dto: UserCredsDto,
   ): Promise<ReadableUserDto> {
     console.log(req.ip);
-    console.log(req.cookies?.token);
+    console.log(req.cookies);
     const userData = await this.authService.signIn(dto);
     res.cookie('token', userData.token, { httpOnly: true });
+    res.cookie('tokenOpen', userData.token);
+    res.cookie('asd', 'asd');
     return {
       login: userData.login,
       id: userData.id,
