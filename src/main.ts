@@ -4,12 +4,18 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import * as requestIp from 'request-ip';
 
+const whitelist = ['http://localhost:3000', 'http://10.1.46.89:3000'];
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    origin: 'http://localhost:3000,http://10.1.46.89:3000',
+    origin: (requestOrigin, callback) => {
+      console.log(requestOrigin);
+      if (whitelist.indexOf(requestOrigin) !== -1) callback(null, true);
+      else callback(new Error('CORS error'));
+    },
     methods: '*',
   });
   const config = new DocumentBuilder().setTitle('File store').build();

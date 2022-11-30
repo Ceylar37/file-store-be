@@ -47,11 +47,7 @@ export class AuthController {
     @Req() req,
     @Res({ passthrough: true }) res,
     @Body() dto: UserCredsDto,
-    @IpAddress() ipAddress,
-    @Ip() ip,
   ): Promise<ReadableUserDto> {
-    console.log(ipAddress);
-    console.log(ip);
     console.log(req.ip);
     const userData = await this.authService.signIn(dto);
     res.cookie('token', userData.token, { httpOnly: true });
