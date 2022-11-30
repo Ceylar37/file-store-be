@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 
 const whitelist = process.env.ORIGINS.split(',');
+console.log(whitelist);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
