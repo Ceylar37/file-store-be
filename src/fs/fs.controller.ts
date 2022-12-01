@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   HttpStatus,
   Param,
   Post,
@@ -96,6 +97,8 @@ export class FsController {
     @Body() body: CreateFileBodyDto,
     @Req() req,
   ) {
+    if (!file)
+      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
     return await this.fsService.createFile({
       userId: req.user.id,
       file,

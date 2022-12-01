@@ -56,11 +56,12 @@ export class FsService {
     return true;
   }
 
-  private async getDirectoryFiles(directoryId): Promise<FileDto[]> {
+  private async getDirectoryFiles(directoryId, userId): Promise<FileDto[]> {
     const aggregationConfig: PipelineStage[] = [
       {
         $match: {
           directoryId,
+          userId,
         },
       },
       {
@@ -75,11 +76,15 @@ export class FsService {
     return this.fileModel.aggregate(aggregationConfig);
   }
 
-  private async getDirectoryDirectories(directoryId): Promise<FileDto[]> {
+  private async getDirectoryDirectories(
+    directoryId,
+    userId,
+  ): Promise<FileDto[]> {
     const aggregationConfig: PipelineStage[] = [
       {
         $match: {
           directoryId,
+          userId,
         },
       },
       {
@@ -136,7 +141,10 @@ export class FsService {
       userId: dto.userId,
       directoryId: dto.directoryId,
     });
-    const directoryFiles = await this.getDirectoryFiles(dto.directoryId);
+    const directoryFiles = await this.getDirectoryFiles(
+      dto.directoryId,
+      dto.userId,
+    );
     if (directoryFiles.some((f) => f.name === dto.name))
       throw new HttpException(
         `File with name: ${dto.name} already exist in this directory`,
@@ -167,6 +175,7 @@ export class FsService {
     });
     const directoryDirectories = await this.getDirectoryDirectories(
       dto.directoryId,
+      dto.userId,
     );
     if (directoryDirectories.some((d) => d.name === dto.name))
       throw new HttpException(
@@ -186,8 +195,11 @@ export class FsService {
     await this.checkDirectoryId(dto);
 
     return {
-      files: await this.getDirectoryFiles(dto.directoryId),
-      directories: await this.getDirectoryDirectories(dto.directoryId),
+      files: await this.getDirectoryFiles(dto.directoryId, dto.userId),
+      directories: await this.getDirectoryDirectories(
+        dto.directoryId,
+        dto.userId,
+      ),
     };
   }
 }

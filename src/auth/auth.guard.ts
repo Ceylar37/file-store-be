@@ -19,7 +19,6 @@ export class AuthGuard implements CanActivate {
     try {
       const authHeader = req.headers.authorization;
       const [bearer, token] = authHeader.split(' ');
-
       if (!token || bearer !== 'Bearer')
         throw new UnauthorizedException('User not authorized');
 
