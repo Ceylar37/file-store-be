@@ -51,10 +51,7 @@ export class FsController {
   @UseGuards(AuthGuard)
   @Get('my')
   async getMyFiles(@Req() req): Promise<FsDto> {
-    const tokenData = await this.jwtService.verify(req.cookies.token, {
-      secret: process.env.SECRET,
-    });
-    return this.fsService.getUserFiles(tokenData.id);
+    return this.fsService.getUserFiles(req.user.id);
   }
 
   // @UseGuards(AuthGuard)
@@ -75,11 +72,10 @@ export class FsController {
   @UseGuards(AuthGuard)
   @Get('read/:id/:name')
   async readFile(@Param('id') id: string, @Req() req) {
-    const tokenData = await this.jwtService.verify(req.cookies.token, {
-      secret: process.env.SECRET,
+    const fileStream = await this.fsService.readFile({
+      id,
+      userId: req.user.id,
     });
-    const userId = tokenData.id;
-    const fileStream = await this.fsService.readFile({ id, userId });
     return new StreamableFile(fileStream);
   }
 
@@ -100,11 +96,8 @@ export class FsController {
     @Body() body: CreateFileBodyDto,
     @Req() req,
   ) {
-    const tokenData = await this.jwtService.verify(req.cookies.token, {
-      secret: process.env.SECRET,
-    });
     return await this.fsService.createFile({
-      userId: tokenData.id,
+      userId: req.user.id,
       file,
       name: body.name,
       directoryId: body.directoryId,
@@ -120,11 +113,8 @@ export class FsController {
   @UseGuards(AuthGuard)
   @Post('createDirectory')
   async createDirectory(@Req() req, @Body() body: CreateDirectoryBodyDto) {
-    const tokenData = await this.jwtService.verify(req.cookies.token, {
-      secret: process.env.SECRET,
-    });
     return await this.fsService.createDirectory({
-      userId: tokenData.id,
+      userId: req.user.id,
       name: body.name,
       directoryId: body.directoryId,
     });
@@ -140,11 +130,8 @@ export class FsController {
   @UseGuards(AuthGuard)
   @Get('directoryContent/:id')
   async getDirectoryContent(@Req() req, @Param('id') directoryId) {
-    const tokenData = await this.jwtService.verify(req.cookies.token, {
-      secret: process.env.SECRET,
-    });
     return await this.fsService.getDirectoryContent({
-      userId: tokenData.id,
+      userId: req.user.id,
       directoryId,
     });
   }
